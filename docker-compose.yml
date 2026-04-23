@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # 1. Ma'lumotlar bazasi
+  db:
+    image: postgres:15
+    container_name: books_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: free_books_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. Backend (FastAPI)
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fastapi_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - db
+    environment:
+      # MUHIM: localhost o'rniga servis nomi 'db' ishlatiladi
+      DATABASE_URL: postgresql://postgres:your_password@db:5432/free_books_db
+
+  # 3. Frontend
+  frontend:
+    build: ./frontend # Frontend papkasi manzili
+    container_name: book_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

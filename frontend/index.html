@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Books Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>📚 Free Books Platform</h1>
+            <p>Discover, read, and share knowledge without limits.</p>
+            <button id="add-book-btn" class="btn primary-btn">+ Add New Book</button>
+        </header>
+
+        <main>
+            <section class="books-section">
+                <h2>Available Books</h2>
+                <div id="books-grid" class="books-grid">
+                    <!-- Books will be injected here via JS -->
+                    <div class="loader">Loading books...</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Book Modal -->
+    <div id="add-book-modal" class="modal hidden">
+        <div class="modal-content glass-effect">
+            <span class="close-btn">&times;</span>
+            <h2>Add a New Book</h2>
+            <form id="add-book-form">
+                <div class="form-group">
+                    <label for="title">Book Title</label>
+                    <input type="text" id="title" required placeholder="e.g. The Great Gatsby">
+                </div>
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" id="author" required placeholder="e.g. F. Scott Fitzgerald">
+                </div>
+                <div class="form-group">
+                    <label for="genre">Genre</label>
+                    <input type="text" id="genre" required placeholder="e.g. Fiction">
+                </div>
+                <div class="form-group">
+                    <label for="file_path">File Path (Server Path)</label>
+                    <input type="text" id="file_path" required placeholder="e.g. ./books/gatsby.pdf">
+                </div>
+                <button type="submit" class="btn primary-btn full-width">Submit Book</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
