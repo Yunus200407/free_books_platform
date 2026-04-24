@@ -17,6 +17,4 @@ class Book(BookBase):
     download_count: int
 
     class Config:
-        # Bu qator SQLAlchemy modellari bilan Pydantic o'rtasida 
-        # "tushunmovchilik" bo'lmasligi uchun kerak
         from_attributes = True

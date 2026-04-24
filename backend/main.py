@@ -1,11 +1,9 @@
 import os
 from pathlib import Path
-from urllib.parse import urlparse
 
-import httpx
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
@@ -78,33 +76,19 @@ def download_book(book_id: int, db: Session = Depends(get_db)):
     if db_book is None:
         raise HTTPException(status_code=404, detail="Kitob topilmadi")
 
-    file_path = (db_book.file_path or "").strip()
-
-    # Remote file (URL) bo'lsa: server orqali stream qilib "download" qildirib yuboramiz.
-    parsed = urlparse(file_path)
-    if parsed.scheme in {"http", "https"}:
-        def _iter_remote():
-            with httpx.Client(follow_redirects=True, timeout=60.0) as client:
-                with client.stream("GET", file_path) as r:
-                    r.raise_for_status()
-                    for chunk in r.iter_bytes():
-                        if chunk:
-                            yield chunk
-
+    # Agar file_path URL bo'lsa,  qilamiz
+    if db_book.file_path.startswith(("http://", "https://")):
         crud.increment_download_count(db, book_id=book_id)
-        return StreamingResponse(
-            _iter_remote(),
-            media_type="application/pdf",
-            headers={"Content-Disposition": f'attachment; filename="{db_book.title}.pdf"'},
-        )
+        return RedirectResponse(url=db_book.file_path)
 
     # Local file bo'lsa: bir nechta ehtimoliy joydan topamiz.
     candidates: list[Path] = []
-    p = Path(file_path)
+    p = Path(db_book.file_path)
     if p.is_absolute():
         candidates.append(p)
     else:
-        rel = Path(file_path.lstrip("/\\").lstrip("./"))
+        # Relativ yo'llarni tozalaymiz
+        rel = Path(db_book.file_path.lstrip("/\\").lstrip("./"))
         candidates.append(_project_root / rel)
         candidates.append(_project_root / "uploads" / rel)
         candidates.append(_project_root / "uploads" / rel.name)
@@ -114,6 +98,7 @@ def download_book(book_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Fayl serverda topilmadi")
 
     crud.increment_download_count(db, book_id=book_id)
+
     return FileResponse(
         path=str(resolved),
         filename=f"{db_book.title}.pdf",

@@ -3,9 +3,6 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# PostgreSQL ulanish formati: 
-# postgresql://user:password@postgresserver/db_name
-# Namuna:
 try:
     # Lokal ishga tushirishda `.env` avtomatik yuklanishi uchun (ixtiyoriy).
     from dotenv import load_dotenv  # type: ignore
